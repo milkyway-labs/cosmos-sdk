@@ -60,3 +60,11 @@ type StakingHooks interface {
 	AfterValidatorCreated(ctx context.Context, valAddr sdk.ValAddress) error // Must be called when a validator is created
 	AfterDelegationModified(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error
 }
+
+// DistrHooks defines event hooks for the distribution module
+type DistrHooks interface {
+	// BeforeDelegationRewardsWithdrawn is called before the rewards are sent. It
+	// allows to modify the rewards before they are sent to the delegator's withdraw
+	// address. The remaining rewards will be added to the community pool.
+	BeforeDelegationRewardsWithdrawn(ctx context.Context, val stakingtypes.ValidatorI, del stakingtypes.DelegationI, withdrawAddr sdk.AccAddress, rewards sdk.DecCoins) (finalRewards sdk.DecCoins, err error)
+}

@@ -243,16 +243,33 @@ func (k Keeper) withdrawDelegationRewards(ctx context.Context, val stakingtypes.
 		)
 	}
 
-	// truncate reward dec coins, return remainder to community pool
-	finalRewards, remainder := rewards.TruncateDecimal()
+	withdrawAddr, err := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+	if err != nil {
+		return nil, err
+	}
 
-	// add coins to user account
-	if !finalRewards.IsZero() {
-		withdrawAddr, err := k.GetDelegatorWithdrawAddr(ctx, delAddr)
+	modifiedRewards := rewards
+	if k.hooks != nil {
+		modifiedRewards, err = k.hooks.BeforeDelegationRewardsWithdrawn(ctx, val, del, withdrawAddr, rewards)
 		if err != nil {
 			return nil, err
 		}
+		// Check if the returned rewards are greater than the available rewards
+		if _, hasNeg := rewards.SafeSub(modifiedRewards); hasNeg {
+			return nil, fmt.Errorf(
+				"hook returned more rewards than available: %s > %s",
+				modifiedRewards.String(),
+				rewards.String(),
+			)
+		}
+	}
 
+	// truncate reward dec coins, return remainder to community pool
+	finalRewards, _ := modifiedRewards.TruncateDecimal()
+	remainder := rewards.Sub(sdk.NewDecCoinsFromCoins(finalRewards...))
+
+	// add coins to user account
+	if !finalRewards.IsZero() {
 		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, withdrawAddr, finalRewards)
 		if err != nil {
 			return nil, err
