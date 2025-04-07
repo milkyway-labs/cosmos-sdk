@@ -431,3 +431,41 @@ func (mr *MockStakingHooksMockRecorder) AfterValidatorCreated(ctx, valAddr inter
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AfterValidatorCreated", reflect.TypeOf((*MockStakingHooks)(nil).AfterValidatorCreated), ctx, valAddr)
 }
+
+// MockDistrHooks is a mock of DistrHooks interface.
+type MockDistrHooks struct {
+	ctrl     *gomock.Controller
+	recorder *MockDistrHooksMockRecorder
+}
+
+// MockDistrHooksMockRecorder is the mock recorder for MockDistrHooks.
+type MockDistrHooksMockRecorder struct {
+	mock *MockDistrHooks
+}
+
+// NewMockDistrHooks creates a new mock instance.
+func NewMockDistrHooks(ctrl *gomock.Controller) *MockDistrHooks {
+	mock := &MockDistrHooks{ctrl: ctrl}
+	mock.recorder = &MockDistrHooksMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDistrHooks) EXPECT() *MockDistrHooksMockRecorder {
+	return m.recorder
+}
+
+// BeforeDelegationRewardsWithdrawn mocks base method.
+func (m *MockDistrHooks) BeforeDelegationRewardsWithdrawn(ctx context.Context, val types0.ValidatorI, del types0.DelegationI, withdrawAddr types.AccAddress, rewards types.DecCoins) (types.DecCoins, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BeforeDelegationRewardsWithdrawn", ctx, val, del, withdrawAddr, rewards)
+	ret0, _ := ret[0].(types.DecCoins)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BeforeDelegationRewardsWithdrawn indicates an expected call of BeforeDelegationRewardsWithdrawn.
+func (mr *MockDistrHooksMockRecorder) BeforeDelegationRewardsWithdrawn(ctx, val, del, withdrawAddr, rewards interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BeforeDelegationRewardsWithdrawn", reflect.TypeOf((*MockDistrHooks)(nil).BeforeDelegationRewardsWithdrawn), ctx, val, del, withdrawAddr, rewards)
+}
